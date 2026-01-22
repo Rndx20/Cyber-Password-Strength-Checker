@@ -2,61 +2,77 @@ import re
 
 def check_password_strength(password):
     """
-    Function to evaluate the strength of a password based on common security standards.
+    Evaluate password strength based on security rules.
     Developed by: Renad Alshamrani
     """
-    strength = 0
-    feedback = []
-    
-    # 1. Check length (Minimum 8 characters)
-    if len(password) >= 8:
-        strength += 1
+
+    score = 0
+    suggestions = []
+
+    # Length check
+    if len(password) >= 12:
+        score += 2
+    elif len(password) >= 8:
+        score += 1
     else:
-        feedback.append("Password is too short (minimum 8 characters).")
-    
-    # 2. Check for numbers
+        suggestions.append("Increase length to at least 8 characters.")
+
+    # Digit check
     if re.search(r"\d", password):
-        strength += 1
+        score += 1
     else:
-        feedback.append("Add at least one digit (0-9).")
-    
-    # 3. Check for uppercase and lowercase letters
-    if re.search(r"[a-z]", password) and re.search(r"[A-Z]", password):
-        strength += 1
+        suggestions.append("Add at least one number (0-9).")
+
+    # Upper & lower case check
+    if re.search(r"[a-z]", password):
+        score += 1
     else:
-        feedback.append("Mix both uppercase and lowercase letters.")
-    
-    # 4. Check for special characters
+        suggestions.append("Add lowercase letters.")
+
+    if re.search(r"[A-Z]", password):
+        score += 1
+    else:
+        suggestions.append("Add uppercase letters.")
+
+    # Special character check
     if re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
-        strength += 1
+        score += 1
     else:
-        feedback.append("Add at least one special character (e.g., @, #, $, %).")
+        suggestions.append("Add a special character (e.g., @, #, $).")
 
-    # Final Result Logic
-    print("-" * 30)
-    if strength == 4:
-        return "Result: Strong Password (Excellent Security)"
-    elif strength == 3:
-        return f"Result: Medium Password. \nSuggestions: {' '.join(feedback)}"
+    # Final evaluation
+    if score >= 6:
+        level = "Strong"
+    elif score >= 4:
+        level = "Medium"
     else:
-        return f"Result: Weak Password! \nRequirements: {' '.join(feedback)}"
+        level = "Weak"
 
-# Interactive User Input
-# --- This is the Loop section ---
+    return {
+        "strength": level,
+        "score": f"{score}/7",
+        "suggestions": suggestions
+    }
+
+
 if __name__ == "__main__":
-    while True: # This starts the continuous loop
-        print("\n" + "="*45)
-        print("   Cybersecurity Tool: Password Strength Checker")
-        print("="*45)
-        
-        # Ask user for input
-        user_pwd = input("Enter a password to evaluate (or type 'exit' to quit): ")
-        
-        # Check if the user wants to close the program
-        if user_pwd.lower() == 'exit':
-            print("Exiting... Stay safe!")
+    while True:
+        print("\n" + "=" * 50)
+        print(" Cybersecurity Tool: Password Strength Checker ")
+        print("=" * 50)
+
+        user_pwd = input("Enter password (or type 'exit' to quit): ")
+
+        if user_pwd.lower() == "exit":
+            print("Exiting... Stay safe! 🔐")
             break
-            
-        # Run the strength checker function
+
         result = check_password_strength(user_pwd)
-        print(result)
+
+        print(f"\nPassword Strength: {result['strength']}")
+        print(f"Security Score: {result['score']}")
+
+        if result["suggestions"]:
+            print("Suggestions:")
+            for tip in result["suggestions"]:
+                print(f"- {tip}")
